@@ -40,6 +40,12 @@ jobs:
           if (!/^v?\d+\.\d+\.\d+$/.test(release.Version)) {
             throw new Error(`Invalid release version: ${release.Version}`);
           }
+          for (const path of ['release/release-summary.yml', 'release/deployment-config.yml', 'release/rollback.yml']) {
+            const content = fs.readFileSync(path, 'utf8');
+            if (!content.includes(`v${release.Version.replace(/^v/, '')}`)) {
+              throw new Error(`${path} does not reference ${release.Version}`);
+            }
+          }
           NODE
 
   deploy-production:

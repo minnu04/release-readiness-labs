@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lab-app
+  labels:
+    app.kubernetes.io/name: lab-app
+    app.kubernetes.io/version: v2.3.0
+    app.kubernetes.io/part-of: orderflow
 spec:
   replicas: 3
   selector:
@@ -14,7 +18,8 @@ spec:
     spec:
       containers:
       - name: lab-app
-        image: lab-app:production-build
+        image: lab-app:v2.3.0
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
         env:
