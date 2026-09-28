@@ -4,30 +4,64 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-release
+  cancel-in-progress: false
 
 jobs:
-  deploy-production:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Deploy to Production
-        run: |
-          chmod +x scripts/deploy.sh
-          ./scripts/deploy.sh
-
   validate-release:
     runs-on: ubuntu-latest
-    needs: deploy-production
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Run Tests
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Run validation tests
         run: |
-          echo "Running validation tests..."
-          npm install --prefix app
+          npm ci --prefix app
           npm test --prefix app
-          echo "Validation complete - some tests failed because deployment config has errors"
-          exit 1
+
+      - name: Validate release metadata
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const release = JSON.parse(fs.readFileSync('release/release.json', 'utf8'));
+          if (!/^v?\d+\.\d+\.\d+$/.test(release.Version)) {
+            throw new Error(`Invalid release version: ${release.Version}`);
+          }
+          NODE
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: validate-release
+    environment:
+      name: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: release
+        shell: bash
+        run: |
+          version="$(node -p "require('./release/release.json').Version")"
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Production
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          chmod +x scripts/deploy.sh
+          ./scripts/deploy.sh "$RELEASE_VERSION"
