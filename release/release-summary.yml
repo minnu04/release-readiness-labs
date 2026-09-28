@@ -1,5 +1,5 @@
 status: unknown
 environment: production
-version: v2.3.0
+version:  v2.3.0
 approval: pending
 rollback: none
