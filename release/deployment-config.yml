@@ -1,5 +1,13 @@
 environment: production
-image_tag: production-build
+version: v2.3.0
+image: lab-app:v2.3.0
+deployment_strategy: rolling
+infrastructure:
+  platform: kubernetes
+  provider: aws
+  region: us-east-1
+  manifest: deployment/kubernetes/deployment.yaml
+  provisioning: deployment/terraform
 secrets:
   API_KEY: ${API_KEY}
   DATABASE_PASSWORD: ${DATABASE_PASSWORD}

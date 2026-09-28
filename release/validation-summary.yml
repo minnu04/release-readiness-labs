@@ -1,0 +1,21 @@
+release_version: v2.3.0
+environment: production
+validation_status: passed
+checks:
+  dependency_install:
+    command: npm ci --prefix app
+    result: passed
+  application_tests:
+    command: npm test --prefix app
+    result: passed
+  release_metadata:
+    result: passed
+    references: release/release.json
+  secret_scan:
+    result: passed
+    policy: no plaintext production credentials
+  deployment_manifest:
+    result: passed
+    image: lab-app:v2.3.0
+deployment_approval: pending
+validated_by: release-validation-workflow

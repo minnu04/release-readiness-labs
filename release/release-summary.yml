@@ -1,5 +1,9 @@
-status: unknown
+status: ready-for-approval
 environment: production
-version:  v2.3.0
+version: v2.3.0
+deployment_strategy: rolling
+infrastructure_decision: AWS-hosted Kubernetes, provisioned through Terraform
 approval: pending
-rollback: none
+rollback: configured
+approval_checklist: release/production-approval-checklist.yml
+validation_summary: release/validation-summary.yml

@@ -1,0 +1,13 @@
+release_version: v2.3.0
+environment: production
+approval_source: github_environment
+approval_environment: production
+required_checks:
+  - validation workflow completed successfully
+  - release metadata references v2.3.0
+  - immutable image lab-app:v2.3.0 is available
+  - Kubernetes deployment manifest reviewed
+  - production secrets are supplied by the environment secret store
+  - rollback target is the previous successful release
+approval_status: pending
+approver: github_environment_reviewer

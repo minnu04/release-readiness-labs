@@ -1,2 +1,4 @@
-rollback_strategy: 
-target_version: 
+release_version: v2.3.0
+rollback_strategy: redeploy_previous_immutable_version
+target_version: previous_successful_release
+release_artifact: release/release.json
